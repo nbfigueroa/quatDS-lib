@@ -11,7 +11,6 @@ att_quat = quaternion(att_R);
 
 % Initial configurations
 x0_all = [[0,0,0.5]' [0.5,0,0.5]'  [1,0,0.5]'];
-
 roll_1 = -1.5; pitch_1 = 1.5; yaw_1= 2.13535;
 roll_2 =  2.5; pitch_2 = -1.5; yaw_2= -2.13535;
 quat0_all = [[1,0,0,0]' quaternion(eul2rotm([yaw_1,pitch_1,roll_1]')) quaternion(eul2rotm([yaw_2,pitch_2,roll_2]')) ];
@@ -33,20 +32,22 @@ for i=1:1+size(x0_all,2)
     % Draw Frame
     drawframe(H(:,:,i),0.075); hold on;    
 end
+text(att_pos(1),att_pos(2),att_pos(3),'$x^*,q^*$','FontSize',20,'Interpreter','LaTex');
 grid on;
 axis equal;
 xlabel('x','Interpreter','LaTex');
 ylabel('y','Interpreter','LaTex');
 zlabel('z','Interpreter','LaTex');
+view([129 30])
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%    Define linear DS for position and quaternion   %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Select initial pose
-init = 1;
+init = 3;
 
-% Position DS parameters
+% Position S parameters
 A_pos = 0.5*diag([-1;-2;-3]);
 ds_pos = @(x) linear_ds(x,att_pos,A_pos);
 
@@ -55,7 +56,7 @@ A_quat = -1.5*eye(3);
 ds_quat = @(q) linear_quat_ds(q,att_quat,A_quat);
 
 % Initial values/simulation parameters
-dt = 0.05; iter = 1; 
+dt = 0.075; iter = 1; 
 Max_iter = 500;
 x_sim = []; x_curr = x0_all(:,init);
 q_sim = []; q_curr = quat0_all(:,init);
