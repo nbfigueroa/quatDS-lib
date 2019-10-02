@@ -9,11 +9,20 @@ roll = -0.015; pitch = 0.001; yaw= 3.13535;
 att_R = eul2rotm([yaw,pitch,roll]');
 att_quat = quaternion(att_R);
 
+% From real robot simulation
+att_pos = [-0.419, -0.0468, 0.15059]';
+att_quat = [-0.04616,-0.124,0.991007,-0.018758]';
+att_R =  quaternion(att_quat);
+
 % Initial configurations
-x0_all = [[0,0,0.5]' [0.5,0,0.5]'  [1,0,0.5]'];
+% x0_all = [[0,0,0.5]' [0.5,0,0.5]'  [1,0,0.5]'  [-0.4486, 0.3119, 0.43699]'];
 roll_1 = -1.5; pitch_1 = 1.5; yaw_1= 2.13535;
 roll_2 =  2.5; pitch_2 = -1.5; yaw_2= -2.13535;
-quat0_all = [[1,0,0,0]' quaternion(eul2rotm([yaw_1,pitch_1,roll_1]')) quaternion(eul2rotm([yaw_2,pitch_2,roll_2]')) ];
+quat0_all = [[1,0,0,0]' quaternion(eul2rotm([yaw_1,pitch_1,roll_1]')) quaternion(eul2rotm([yaw_2,pitch_2,roll_2]')) [0.69736, -0.0454,-0.713,0.05638]' ];
+
+% From real robot simulation
+x0_all = [-0.4486, 0.3119, 0.43699]';
+quat0_all = [0.69736, -0.0454,-0.713,0.05638]';
 
 %%%%% Visualize target and init %%%%%%
 figure('Color',[1 1 1]);
@@ -45,7 +54,7 @@ view([129 30])
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Select initial pose
-init = 3;
+init = 1;
 
 % Position S parameters
 A_pos = 0.5*diag([-1;-2;-3]);
