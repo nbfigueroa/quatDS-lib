@@ -1,2 +1,2 @@
 ## quat-DS
-MATLAB/C++ code and demo scripts for quaternion dynamical systems.
+MATLAB/C++ library and demo scripts (including ROS) for quaternion dynamical systems.
