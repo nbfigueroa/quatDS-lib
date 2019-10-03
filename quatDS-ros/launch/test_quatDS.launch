@@ -1,0 +1,10 @@
+<launch>
+  <node
+    name="test_quatDS_node"
+    pkg="quatDS"
+    type="test_quatDS_node"
+    output="screen" />
+
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="world_broadcaster" args="0 0 0 0 0 0 1 map world" />
+</launch>

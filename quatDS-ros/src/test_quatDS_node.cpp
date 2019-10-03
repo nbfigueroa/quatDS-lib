@@ -18,6 +18,7 @@
 
 
 #include "ros/ros.h"
+#include <tf/transform_broadcaster.h>
 #include <vector>
 #include "eigen3/Eigen/Dense"
 #include "Quaternions.h"
@@ -52,16 +53,25 @@ int main(int argc, char **argv)
     x_att << -0.419, -0.0468, 0.15059;
     q_att << -0.04616,-0.124,0.991007,-0.018758;
 
-    /* Test simulation */ 
-    int i (1), max_iter(500);
-    double dt(0.075), pos_error(0), quat_error(0);
+    /* Parameters for simulation */ 
+    int i (1);
+    double dt(0.0025), pos_error(0), quat_error(0);
     VectorXd x_dot(VectorXd::Zero(3,1)), omega(VectorXd::Zero(3,1));
     VectorXd x_curr(VectorXd::Zero(3,1)), q_curr(VectorXd::Zero(4,1));
-    
+    static tf::TransformBroadcaster br;
+    tf::Transform pose_curr, target, init;
+    target.setOrigin(tf::Vector3(x_att(0), x_att(1), x_att(2)));
+    target.setRotation(tf::Quaternion(q_att(1),q_att(2),q_att(3),q_att(0)));
+
+
     /* Define initial position and orientation */
     x_curr << -0.4486, 0.3119, 0.43699;
     q_curr << 0.69736, -0.0454,-0.713,0.05638;
-    while (i<max_iter){
+    init.setOrigin(tf::Vector3(x_curr(0), x_curr(1), x_curr(2)));
+    init.setRotation(tf::Quaternion(q_curr(1),q_curr(2),q_curr(3),q_curr(0)));
+
+    /* Simulation loop */
+    while (ros::ok()){
 
     	/* Position Dynamics Computation */
         x_dot  = A_p * (x_curr-x_att);
@@ -77,10 +87,22 @@ int main(int argc, char **argv)
 
         /* Monitor convergence */
         cout << "[iter=" << i<< " ] Position Error: " << pos_error << 
-                 " " << "Orientation Error:" << quat_error << endl;
-		if (pos_error < 0.0025 && quat_error < 0.025)
+                 " " << "Orientation Error:" << quat_error << endl;    
+		if (pos_error < 0.005 && quat_error < 0.01)
 			break;
     	i++;
+
+
+    	/* Create transform to broadcast */
+        pose_curr.setOrigin(tf::Vector3(x_curr(0), x_curr(1), x_curr(2)));
+		pose_curr.setRotation(tf::Quaternion(q_curr(1),q_curr(2),q_curr(3),q_curr(0)));
+		br.sendTransform(tf::StampedTransform(pose_curr, ros::Time::now(),  "world", "robot_pose"));
+        br.sendTransform(tf::StampedTransform(target, ros::Time::now(),  "world", "attractor"));
+        br.sendTransform(tf::StampedTransform(init, ros::Time::now(),  "world", "init"));
+
+		ros::spinOnce();
+		ros::Duration(dt).sleep();
+
     }
 
     // Stop the node's resources
