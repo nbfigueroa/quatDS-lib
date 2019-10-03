@@ -1,18 +1,14 @@
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%   Define att/init positions and quaternion  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clear all; close all; clc;
 
-% Attractors
+%% %%% Toy Attractors and Init poses %%%%%
+clear all; close all; clc;
+% Attractor
 att_pos = [0.5,0.25,0]';
 roll = -0.015; pitch = 0.001; yaw= 3.13535;
 att_R = eul2rotm([yaw,pitch,roll]');
 att_quat = quaternion(att_R);
-
-% From real robot simulation
-att_pos = [-0.419, -0.0468, 0.15059]';
-att_quat = [-0.04616,-0.124,0.991007,-0.018758]';
-att_R =  quaternion(att_quat);
 
 % Initial configurations
 % x0_all = [[0,0,0.5]' [0.5,0,0.5]'  [1,0,0.5]'  [-0.4486, 0.3119, 0.43699]'];
@@ -20,11 +16,19 @@ roll_1 = -1.5; pitch_1 = 1.5; yaw_1= 2.13535;
 roll_2 =  2.5; pitch_2 = -1.5; yaw_2= -2.13535;
 quat0_all = [[1,0,0,0]' quaternion(eul2rotm([yaw_1,pitch_1,roll_1]')) quaternion(eul2rotm([yaw_2,pitch_2,roll_2]')) [0.69736, -0.0454,-0.713,0.05638]' ];
 
-% From real robot simulation
-x0_all = [-0.4486, 0.3119, 0.43699]';
-quat0_all = [0.69736, -0.0454,-0.713,0.05638]';
 
-%%%%% Visualize target and init %%%%%%
+%% %%% Real Robot Attractors and Init poses %%%%%
+clear all; close all; clc;
+% Attractor
+att_pos = [-0.419, -0.0468, 0.15059]';
+att_quat = [-0.04616,-0.124,0.991007,-0.018758]';
+att_R =  quaternion(att_quat);
+
+% From real robot simulation
+x0_all = [[-0.398287790221, 0.276403682489, 0.40357671952]' [-0.3687019795, -0.31078379649, 0.353700792986]' [-0.674814265398, 0.214883445878, 0.614376695163]'];
+quat0_all = [[0.590064946744, 0.679998360383, -0.300609096301, -0.314737604554]' [0.711304, -0.021037765273, -0.702077440469, -0.0262812481386]' [0.746608, 0.563370280825, -0.201834619809, -0.290607963541]'];
+
+%% %%% Visualize target and init %%%%%%
 figure('Color',[1 1 1]);
 
 % Draw World Reference Frame
@@ -54,7 +58,7 @@ view([129 30])
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Select initial pose
-init = 1;
+init = 3;
 
 % Position S parameters
 A_pos = 0.5*diag([-1;-2;-3]);

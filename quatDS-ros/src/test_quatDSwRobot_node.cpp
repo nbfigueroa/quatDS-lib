@@ -65,22 +65,8 @@ int main(int argc, char **argv)
 
 
     /* Define initial position and orientation */
-    int init_pose = 2;
-    if (init_pose == 1){
-            /* From go_center position (from kuka-lags-tasks) */
-            x_curr << -0.398287790221, 0.276403682489, 0.40357671952;
-            q_curr << 0.590064946744, 0.679998360383, -0.300609096301, -0.314737604554;
-    }else if(init_pose == 2){
-            /* From go_left position (from simple examples) */
-            x_curr << -0.3687019795, -0.31078379649, 0.353700792986;
-            q_curr << 0.711304, -0.021037765273, -0.702077440469, -0.0262812481386;
-    }else if (init_pose == 3){
-            /* From go_top_center position (from kuka-lags-tasks) */
-            x_curr << -0.674814265398, 0.214883445878, 0.614376695163;
-            q_curr <<  0.746608, 0.563370280825, -0.201834619809, -0.290607963541;
-    }
-
-    
+    x_curr << -0.4486, 0.3119, 0.43699;
+    q_curr << 0.69736, -0.0454,-0.713,0.05638;
     init.setOrigin(tf::Vector3(x_curr(0), x_curr(1), x_curr(2)));
     init.setRotation(tf::Quaternion(q_curr(1),q_curr(2),q_curr(3),q_curr(0)));
 
