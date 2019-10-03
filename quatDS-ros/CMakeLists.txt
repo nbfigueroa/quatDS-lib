@@ -73,10 +73,12 @@ add_library(${PROJECT_NAME} ${H_FILES}  ${SRCS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 ## Declare a C++ executable
-add_executable(test_quatDS      ../quatDS-cpp/src/test_quatDS.cpp)
-add_executable(test_quatDS_node src/test_quatDS_node.cpp)
+add_executable(test_quatDS            ../quatDS-cpp/src/test_quatDS.cpp)
+add_executable(test_quatDS_node       src/test_quatDS_node.cpp)
+add_executable(test_quatDSwRobot_node src/test_quatDSwRobot_node.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(test_quatDS      quatDS ${catkin_LIBRARIES})
 target_link_libraries(test_quatDS_node quatDS ${catkin_LIBRARIES})
+target_link_libraries(test_quatDSwRobot_node quatDS ${catkin_LIBRARIES})
 
