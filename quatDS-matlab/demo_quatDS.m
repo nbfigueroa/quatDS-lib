@@ -32,7 +32,7 @@ quat0_all = [[0.590064946744, 0.679998360383, -0.300609096301, -0.314737604554]'
 figure('Color',[1 1 1]);
 
 % Draw World Reference Frame
-drawframe(eye(4),0.025); hold on;
+% drawframe(eye(4),0.025); hold on;
 
 % Draw World Reference Frame
 H = zeros(4,4,1+size(x0_all,2)    );
@@ -41,7 +41,7 @@ H(1:3,4,1)   = att_pos;
 H(1:3,1:3,2:end) = quaternion(quat0_all);
 H(1:3,4,2:end)   = x0_all;
 
-for i=1:1+size(x0_all,2)    
+for i=1:1+size(x0_all,2)-1    
     % Draw Frame
     drawframe(H(:,:,i),0.075); hold on;    
 end
@@ -51,14 +51,14 @@ axis equal;
 xlabel('x','Interpreter','LaTex');
 ylabel('y','Interpreter','LaTex');
 zlabel('z','Interpreter','LaTex');
-view([129 30])
+view([-117 12])
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%    Define linear DS for position and quaternion   %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Select initial pose
-init = 3;
+init = 2;
 
 % Position S parameters
 A_pos = 0.5*diag([-1;-2;-3]);
