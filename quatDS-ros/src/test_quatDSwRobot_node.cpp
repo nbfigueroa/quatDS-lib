@@ -30,8 +30,6 @@ using namespace Eigen;
 
 /****************   Global Variables **********************/
 geometry_msgs::Pose  msg_real_pose_;
-// VectorXd real_position_(VectorXd::Zero(3,1));
-// VectorXd real_quaternion_(VectorXd::Zero(4,1));
 
 /* Initialize Linear Position DS parameters */
 MatrixXd A_p(MatrixXd::Zero(3,3));
@@ -45,7 +43,7 @@ VectorXd q_att(VectorXd::Zero(4,1));
 /* Define Initialize pOSE */
 VectorXd x_curr(VectorXd::Zero(3,1)), q_curr(VectorXd::Zero(4,1));
 VectorXd x_des(VectorXd::Zero(3,1)), q_des(VectorXd::Zero(4,1));
-double dt(0.005), ds_velocity_limit(0.15);
+double dt(0.005), ds_velocity_limit(0.25);
 
 /* Subscribers/Publishers*/
 geometry_msgs::Twist      msg_desired_velocity_;
@@ -86,20 +84,26 @@ void robotPoseCallback(const geometry_msgs::Pose::ConstPtr& msg)
         x_dot = x_dot.normalized() * ds_velocity_limit;    
     pos_error = (x_curr-x_att).norm();
     ROS_INFO_STREAM( "Translational Velocity: " << x_dot(0) << " " << x_dot(1) << " " << x_dot(2));    
-    
+    if (pos_error < 0.02){
+        ROS_INFO_STREAM("******** POSITION ATTRACTOR REACHED ********");
+        x_dot(0)=0; x_dot(1)=0; x_dot(2)=0;
+    }
 
     /* Quaternion Dynamics Computation */
-    omega  =  A_o * quat_diff(q_curr, q_att);
+    omega  =   A_o * quat_diff(q_curr, q_att);
     if (omega.norm() > ds_velocity_limit*5)
         omega = omega.normalized() * ds_velocity_limit*5;
     quat_error = quat_diff(q_curr, q_att).norm();
     ROS_INFO_STREAM( "Angular Velocity: " << omega(0) << " " << omega(1) << " " << omega(2));    
+    if (quat_error < 0.05){
+        ROS_INFO_STREAM("******** QUATERNION ATTRACTOR REACHED ********");
+        omega(0)=0; omega(1)=0; omega(2)=0;
+    }
     /********************************************************************/
-
 
     /* Publish velocity commands */
     x_des = x_curr + x_dot*dt;
-    q_des = quat_mul(quat_exp(0.5 * quat_deriv(omega * dt * 50)), q_curr);
+    q_des = quat_mul(quat_exp(0.5 * quat_deriv(omega * dt * 10 )), q_curr);
 
     msg_desired_velocity_.linear.x  = x_dot(0);
     msg_desired_velocity_.linear.y  = x_dot(1);
@@ -117,11 +121,6 @@ void robotPoseCallback(const geometry_msgs::Pose::ConstPtr& msg)
 
     /* Monitor convergence */
     ROS_INFO_STREAM( "Position Error: " << pos_error << " " << "Orientation Error:" << quat_error );    
-    if (pos_error < 0.025 && quat_error < 0.025){
-        ROS_INFO_STREAM("******** ATTRACTORS REACHED ********");
-        x_dot(0)=0; x_dot(1)=0; x_dot(2)=0;
-        omega(0)=0; omega(1)=0; omega(2)=0;
-    }
             
 
     /* Broadcast Transforms */
@@ -129,7 +128,6 @@ void robotPoseCallback(const geometry_msgs::Pose::ConstPtr& msg)
     pose_des.setRotation(tf::Quaternion(q_des(1),q_des(2),q_des(3),q_des(0)));
     br.sendTransform(tf::StampedTransform(pose_des, ros::Time::now(),  "lwr_base_link", "desired_pose"));
     br.sendTransform(tf::StampedTransform(target, ros::Time::now(),  "lwr_base_link", "attractor"));
-    // br.sendTransform(tf::StampedTransform(init, ros::Time::now(),  "world", "init"));
 
 }
 
@@ -154,22 +152,6 @@ int main(int argc, char **argv)
 
     x_att << -0.419, -0.0468, 0.15059;
     q_att << -0.04616,-0.124,0.991007,-0.018758;    
-
-    // int init_pose = 2;
-    // if (init_pose == 1){
-    //         /* From go_center position (from kuka-lags-tasks) */
-    //         x_curr << -0.398287790221, 0.276403682489, 0.40357671952;
-    //         q_curr << 0.590064946744, 0.679998360383, -0.300609096301, -0.314737604554;
-    // }else if(init_pose == 2){
-    //         /* From go_left position (from simple examples) */
-    //         x_curr << -0.3687019795, -0.31078379649, 0.353700792986;
-    //         q_curr << 0.711304, -0.021037765273, -0.702077440469, -0.0262812481386;
-    // }else if (init_pose == 3){
-    //         /* From go_top_center position (from kuka-lags-tasks) */
-    //         x_curr << -0.674814265398, 0.214883445878, 0.614376695163;
-    //         q_curr <<  0.746608, 0.563370280825, -0.201834619809, -0.290607963541;
-    // }
-    /*******************************************************************************/
 
     sub_robot_pose_     = nh.subscribe("/lwr/ee_pose", 1000, robotPoseCallback);
     pub_desired_twist_  = nh.advertise<geometry_msgs::Twist>("/lwr/joint_controllers/passive_ds_command_vel", 1);
